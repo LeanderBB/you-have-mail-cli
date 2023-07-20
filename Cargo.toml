@@ -1,0 +1,30 @@
+[package]
+name = "you-have-mail-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Leander Beernaert <lbb-dev@pm.me>"]
+license = "AGPL-3.0-only"
+categories = ["email", "command-line-utilities"]
+readme = "README.md"
+repository= "https://github.com/LeanderBB/you-have-mail-cli"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+you-have-mail-common = {git= "https://github.com/LeanderBB/you-have-mail-common" }
+config = "0.13"
+dirs = "5.0.0"
+ctrlc = "3"
+anyhow = "1"
+keyring = {version = "2", optional = true}
+log = "0.4"
+clap = {version ="4", features = ["derive"]}
+serde = {version = "1", features = ["derive"]}
+crossbeam-channel = "0.5"
+log4rs = "1"
+rpassword = "7.2.0"
+
+[features]
+default = ["keyring-secrets"]
+keyring-secrets = ["keyring"]
+
