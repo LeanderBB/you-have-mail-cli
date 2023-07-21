@@ -1,6 +1,6 @@
 [package]
 name = "you-have-mail-cli"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Leander Beernaert <lbb-dev@pm.me>"]
 license = "AGPL-3.0-only"
@@ -23,8 +23,10 @@ serde = {version = "1", features = ["derive"]}
 crossbeam-channel = "0.5"
 log4rs = "1"
 rpassword = "7.2.0"
+ureq = {version ="2.6", optional = true}
 
 [features]
-default = ["keyring-secrets"]
+default = ["keyring-secrets", "notifier-unified-push"]
 keyring-secrets = ["keyring"]
+notifier-unified-push = ["ureq"]
 

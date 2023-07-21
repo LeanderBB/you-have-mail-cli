@@ -13,16 +13,11 @@ cargo install --git="https://github.com/LeanderBB/you-have-mail-cli"
 ```
 ## Configuration
 
-### Notifiers
-
-* **StdOut**: Log notification to standard output.
-
 ### Secrets Storage
 
 * **Plain**: Store the encryption key on disk unencrypted.
 * **Keyring**: Store encryption key in OS's keychain ([crate](https://crates.io/crates/keyring)).
   * Enabled by default with feature `secrets-keyring`
-
 
 ### Observer
 The observer requires that a configuration file be present with the following entries:
@@ -30,12 +25,12 @@ The observer requires that a configuration file be present with the following en
 ```toml
 # Secret storage type, use name from the `Secret Storage` section fo this README
 secrets="Plain"
-# List of notifiers, use names fromt eh `Notifiers` section of this README
-notifiers=["StdOut"]
 # Poll interval of the observer in seconds
 poll_interval=15
 # If using Plain secret storage, this must be set to true so you consent to the risks
 accept_plain_secrets_insecure=true
+# Set to true if you wish to write notifications to stdout
+stdout_notifier="false"
 
 # For each account create on entry such as the one below:
 [[account]]
@@ -51,6 +46,28 @@ Finally you can generate a config file if none is present with the `--create-con
 ```bash
 you-have-mail-cli --create-config
 ```
+
+### Notifiers 
+
+#### StdOut
+Prints notifications to stdout. Can be enabled  by setting `stdout_notifier="true"` in the config file.
+
+#### Unified Push (ntfy)
+
+Enabled by default with feature `notifier-unified-push`, for each server instance add the following entry into the config
+file:
+
+```toml
+[[unified-push]]
+# Name of the server to identify in the logs.
+name = "My Sever"
+# Url of the server with topic
+url = "https://..."
+# Optional access token if server needs autentication. 
+auth_token = "..."
+```
+
+_Note:_ Feature tested against public ntfy instances.
 
 ### Account Setup
 

@@ -28,7 +28,7 @@
 #![cfg_attr(feature = "clippy", warn(wrong_pub_self_convention))]
 
 use crate::cfg::load_config;
-use crate::notifiers::{new_notifier, NotifierMultiplexerBuilder};
+use crate::notifiers::NotifierMultiplexerBuilder;
 use crate::secrets::{new_secrets, SecretsType};
 use crate::utils::{
     get_config_file_path, get_default_config_dir, get_default_log_dir, get_or_create_secret_key,
@@ -108,7 +108,6 @@ fn main() -> Result<(), anyhow::Error> {
     let config = load_config(&config_dir, options.create_config)?;
 
     debug!("Secret store = {:?}", config.secrets);
-    debug!("Notifier list= {:?}", config.notifiers);
 
     if config.secrets == SecretsType::Plain && !config.accept_plain_secrets_insecure {
         let msg = "Plain unencrypted secrets storage, please consent to the risks by setting `accept_plain_secrets_insecure=true` in your config file";
@@ -116,7 +115,7 @@ fn main() -> Result<(), anyhow::Error> {
         return Err(anyhow!(msg));
     }
 
-    if config.notifiers.is_empty() {
+    if !config.has_notifiers() {
         let msg = "No notifiers specified";
         error!("{msg}");
         return Err(anyhow!(msg));
@@ -124,12 +123,24 @@ fn main() -> Result<(), anyhow::Error> {
 
     let notifier = {
         let mut builder = NotifierMultiplexerBuilder::new();
-        for n in &config.notifiers {
-            let notifier = new_notifier(*n).map_err(|e| {
-                error!("{e}");
-                e
-            })?;
-            builder = builder.with_notifier(notifier);
+        if config.stdout_notifier {
+            builder = builder.with_notifier(notifiers::new_stdout_notifier());
+        }
+
+        #[cfg(feature = "notifier-unified-push")]
+        {
+            if let Some(unified_pushers) = config.unified_push {
+                for cfg in unified_pushers {
+                    info!(
+                        "Adding Unified Push Notifier: name={}, url={}",
+                        cfg.name, cfg.url
+                    );
+                    let notifier = cfg
+                        .into_notifier()
+                        .map_err(|e| anyhow!("Failed to create unified push notifier: {e}"))?;
+                    builder = builder.with_notifier(notifier);
+                }
+            }
         }
 
         Arc::new(builder.build())
@@ -166,9 +177,20 @@ fn main() -> Result<(), anyhow::Error> {
         }
     };
 
+    let null_backend = you_have_mail_common::backend::null::new_backend(&[
+        you_have_mail_common::backend::null::NullTestAccount {
+            email: "foo".to_string(),
+            password: "foo".to_string(),
+            totp: None,
+            wait_time: None,
+            refresh: false,
+        },
+    ]);
+
     let mut observer = {
         ObserverBuilder::new(notifier, observer_config)
             .default_backends()
+            .with_backend(null_backend)
             .load_from_config()
             .map_err(|e| {
                 error!("{e}");

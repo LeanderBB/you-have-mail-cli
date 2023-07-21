@@ -1,4 +1,4 @@
-use crate::notifiers::NotifiersType;
+use crate::notifiers::UnifiedPushConfig;
 use crate::secrets::SecretsType;
 use crate::utils;
 use anyhow::anyhow;
@@ -9,11 +9,30 @@ use std::path::Path;
 #[derive(Deserialize)]
 pub struct Config {
     pub secrets: SecretsType,
-    pub notifiers: Vec<NotifiersType>,
     pub poll_interval: u64,
+    pub stdout_notifier: bool,
     #[serde(default = "_default_false")]
     pub accept_plain_secrets_insecure: bool,
     pub account: Option<Vec<Account>>,
+
+    #[cfg(feature = "notifier-unified-push")]
+    pub unified_push: Option<Vec<UnifiedPushConfig>>,
+}
+
+impl Config {
+    pub fn has_notifiers(&self) -> bool {
+        let mut result = false;
+        if self.stdout_notifier {
+            result = true;
+        }
+
+        #[cfg(feature = "notifier-unified-push")]
+        if let Some(pushers) = &self.unified_push {
+            result = result || !pushers.is_empty();
+        }
+
+        result
+    }
 }
 
 #[derive(Deserialize)]
@@ -42,6 +61,8 @@ notifiers=["StdOut"]
 poll_interval=300
 # If using Plain secret storage, this must be set to true so you consent to the risks
 #accept_plain_secrets_insecure=true
+# Set to true if you wish to write notifications to stdout
+stdout_notifier="false"
 
 # For each account create on entry such as the one below:
 #[[account]]

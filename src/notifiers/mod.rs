@@ -1,9 +1,13 @@
 //! Collection of notifier implementations.
-use serde::Deserialize;
 use you_have_mail_common::Notification;
 use you_have_mail_common::Notifier as YHMNotifier;
 
 mod stdout_notifier;
+
+#[cfg(feature = "notifier-unified-push")]
+mod unified_push;
+#[cfg(feature = "notifier-unified-push")]
+pub use unified_push::UnifiedPushConfig;
 
 pub trait Notifier: Send + Sync {
     fn notify(&self, notification: &Notification);
@@ -43,13 +47,6 @@ impl YHMNotifier for NotifierMultiplexer {
     }
 }
 
-#[derive(Debug, Deserialize, Copy, Clone, Eq, PartialEq)]
-pub enum NotifiersType {
-    StdOut,
-}
-
-pub fn new_notifier(t: NotifiersType) -> Result<Box<dyn Notifier>, anyhow::Error> {
-    match t {
-        NotifiersType::StdOut => Ok(Box::new(stdout_notifier::StdOutNotifier {})),
-    }
+pub fn new_stdout_notifier() -> Box<dyn Notifier> {
+    Box::new(stdout_notifier::StdOutNotifier {})
 }
