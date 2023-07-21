@@ -4,10 +4,10 @@ use you_have_mail_common::Notifier as YHMNotifier;
 
 mod stdout_notifier;
 
-#[cfg(feature = "notifier-unified-push")]
-mod unified_push;
-#[cfg(feature = "notifier-unified-push")]
-pub use unified_push::UnifiedPushConfig;
+#[cfg(feature = "notifier-ntfy")]
+mod ntfy_notifier;
+#[cfg(feature = "notifier-ntfy")]
+pub use ntfy_notifier::NTFYConfig;
 
 pub trait Notifier: Send + Sync {
     fn notify(&self, notification: &Notification);

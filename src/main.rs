@@ -127,17 +127,14 @@ fn main() -> Result<(), anyhow::Error> {
             builder = builder.with_notifier(notifiers::new_stdout_notifier());
         }
 
-        #[cfg(feature = "notifier-unified-push")]
+        #[cfg(feature = "notifier-ntfy")]
         {
-            if let Some(unified_pushers) = config.unified_push {
+            if let Some(unified_pushers) = config.ntfy {
                 for cfg in unified_pushers {
-                    info!(
-                        "Adding Unified Push Notifier: name={}, url={}",
-                        cfg.name, cfg.url
-                    );
+                    info!("Adding ntfy Notifier: name={}, url={}", cfg.name, cfg.url);
                     let notifier = cfg
                         .into_notifier()
-                        .map_err(|e| anyhow!("Failed to create unified push notifier: {e}"))?;
+                        .map_err(|e| anyhow!("Failed to create ntfy notifier: {e}"))?;
                     builder = builder.with_notifier(notifier);
                 }
             }

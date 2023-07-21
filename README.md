@@ -52,13 +52,14 @@ you-have-mail-cli --create-config
 #### StdOut
 Prints notifications to stdout. Can be enabled  by setting `stdout_notifier="true"` in the config file.
 
-#### Unified Push (ntfy)
+#### ntfy
 
-Enabled by default with feature `notifier-unified-push`, for each server instance add the following entry into the config
+Send notifications to a [ntfy](https://github.com/binwiederhier/ntfy) instance. Enabled by default with feature 
+`notifier-ntfy`, for each server instance add the following entry into the config
 file:
 
 ```toml
-[[unified-push]]
+[[ntfy]]
 # Name of the server to identify in the logs.
 name = "My Sever"
 # Url of the server with topic

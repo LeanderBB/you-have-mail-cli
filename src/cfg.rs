@@ -1,4 +1,4 @@
-use crate::notifiers::UnifiedPushConfig;
+use crate::notifiers::NTFYConfig;
 use crate::secrets::SecretsType;
 use crate::utils;
 use anyhow::anyhow;
@@ -15,8 +15,8 @@ pub struct Config {
     pub accept_plain_secrets_insecure: bool,
     pub account: Option<Vec<Account>>,
 
-    #[cfg(feature = "notifier-unified-push")]
-    pub unified_push: Option<Vec<UnifiedPushConfig>>,
+    #[cfg(feature = "notifier-ntfy")]
+    pub ntfy: Option<Vec<NTFYConfig>>,
 }
 
 impl Config {
@@ -26,8 +26,8 @@ impl Config {
             result = true;
         }
 
-        #[cfg(feature = "notifier-unified-push")]
-        if let Some(pushers) = &self.unified_push {
+        #[cfg(feature = "notifier-ntfy")]
+        if let Some(pushers) = &self.ntfy {
             result = result || !pushers.is_empty();
         }
 

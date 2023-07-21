@@ -1,6 +1,6 @@
 [package]
 name = "you-have-mail-cli"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Leander Beernaert <lbb-dev@pm.me>"]
 license = "AGPL-3.0-only"
@@ -26,7 +26,7 @@ rpassword = "7.2.0"
 ureq = {version ="2.6", optional = true}
 
 [features]
-default = ["keyring-secrets", "notifier-unified-push"]
+default = ["keyring-secrets", "notifier-ntfy"]
 keyring-secrets = ["keyring"]
-notifier-unified-push = ["ureq"]
+notifier-ntfy = ["ureq"]
 
